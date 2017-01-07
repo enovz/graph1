@@ -34,15 +34,35 @@ const graphModule = (function () {
     //view
     let view = {
         /**
-         * jQuery get elements
+         * 1. init template:    1. get graph data
+         *                      2. draw graph
+         * 
+         * 2. drawRelation function :   1. get realtionData
+         *                              2. find realtionData positions
+         *                              3. return line connection 2 realtions in realtionData
+         * 
+         * jQuery get clicked graph element as input
         */
+        init: function(){
+            let ctx = document.getElementById("graph").msGetInputContext('2d');
+        }
     };
 
     //methods
     let methods = {
-        //needs refresh method to update canvas
-
+        /**
+         * refresh method: 1. get graphRelations
+         *                 2. call drawRelation function for each relation
+        */
         helpers: {
+            parseInput: function (input, graph) {
+
+                let result = [];
+                let firstElement = helpers.findByName(input, graph);
+                result.push(firstElement);
+
+                return result;
+            },
             findByName: function (input, graph) {
 
                 for (let i = 0; i < graph.length; i++) {
@@ -61,14 +81,6 @@ const graphModule = (function () {
             }
         },
         traversal: {
-            parseInput: function (input, graph) {
-
-                let result = [];
-                let firstElement = helpers.findByName(input, graph);
-                result.push(firstElement);
-
-                return result;
-            },
             getChildren: function (parent) {
 
                 let result = [];
@@ -211,7 +223,7 @@ const graphModule = (function () {
         getRelations: function (input, graph) {
 
             let relations = [];
-            let parsed = parseInput(input, graph);
+            let parsed = helpers.parseInput(input, graph);
 
             relations = relations.concat(methods.traverseChildren(parsed, graph));
             relations = relations.concat(methods.traverseParents(parsed, graph));
@@ -222,7 +234,7 @@ const graphModule = (function () {
 
     //eventHandlers
     let eventHandlers = {
-        clickOnElement : function(){
+        clickOnElement: function () {
 
             /*input = jQerry get clikced element*/
             let relations = controller.getRelations(input, graph);
@@ -237,5 +249,5 @@ const graphModule = (function () {
     }
 
     return api;
-    
+
 })();
