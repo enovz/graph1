@@ -25,18 +25,17 @@ const graphModule = (function () {
         this.name = name;
         this.children = children.slice();
         this.hasChildren = this.hasChildren();
-    };
+    }
     Element.prototype.hasChildren = function () {
 
         return this.children.length !== 0 ? true : false;
-    };
+    }
+
+    let $el = $('#graph');
 
     //view
     let view = {
-
-        init: function(){
-            
-        }
+        
     };
 
     //methods
