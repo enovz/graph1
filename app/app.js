@@ -31,7 +31,7 @@ const graphModule = (function () {
         ]
     ];
 
-
+    //holds paper
     let $el = $('#graph');
 
     //view
@@ -39,40 +39,52 @@ const graphModule = (function () {
 
     };
 
+    //utils
+    let utils = {
+
+        findByName: function findByName(input, graph) {
+
+            for (let i = 0; i < graph.length; i++) {
+
+                let graphGroup = graph[i];
+
+                let result = graphGroup.filter(element => {
+                    return element.name === input;
+                })
+
+                if (result.length !== 0) {
+                    return result[0];
+                }
+            }
+
+        }
+    }
 
     //methods
     let methods = {
         /**
-         * refresh method: 1. get graphRelations
-         *                 2. call drawRelation function for each relation
+        * refresh method: 1. get graphRelations
+        *                 2. call drawRelation function for each relation
         */
-        helpers: {
-            findByName: function (input, graph) {
 
-                for (let i = 0; i < graph.length; i++) {
+        parseInput: function parseInput(input, graph) {
 
-                    let graphGroup = graph[i];
+            let result = [];
+            let firstElement = utils.findByName(input, graph);
+            result.push(firstElement);
 
-                    let result = graphGroup.filter(element => {
-                        return element.name === input;
-                    })
-
-                    if (result.length !== 0) {
-                        return result[0];
-                    }
-                }
-
-            }
+            return result;
         },
-        traversal: {
-            getChildren: function (parent) {
+        traverseToEnd: function traverseToEnd(firstParent, graph) {
+            //getChildren
+            function getChildren(parent) {
 
                 let result = [];
 
                 if (parent.hasChildren) {
 
                     parent.children.forEach(child => {
-                        result.push(this.helpers.findByName(child, graph));
+                        result.push(utils.findByName(child, graph));
                     });
 
                     return result;
@@ -80,8 +92,9 @@ const graphModule = (function () {
                 else {
                     return null;
                 }
-            },
-            linkToChildren: function (parent) {
+            }
+            //linkToChildren
+            function linkChildrenTo(parent) {
 
                 let relations = [];
 
@@ -101,8 +114,47 @@ const graphModule = (function () {
                 else {
                     return null;
                 }
-            },
-            getParents: function (child, graph) {
+            }
+            //traverse children
+            function traverseChildren(parents, graph, relations = []) {
+
+                if (parents.length === 0) {
+
+                    return relations;
+                }
+                else {
+
+                    let element = parents[0];
+
+                    if (element.hasChildren) {
+
+                        let newRelations = relations.slice();
+                        newRelations = newRelations.concat(linkChildrenTo(element));
+
+                        let children = getChildren(element);
+                        let newParents = [];
+
+                        newParents = parents.concat(children);
+                        newParents.splice(0, 1);
+
+                        return traverseChildren(newParents, graph, newRelations);
+                    }
+                    else {
+                        let newParents = parents.slice();
+                        newParents.splice(0, 1);
+
+                        return traverseChildren(newParents, graph, relations);
+                    }
+
+                }
+
+            }
+
+            return traverseChildren(firstParent, graph);
+        },
+        traverseToStart: function traverseToStart(firstChild, graph) {
+            //getParents
+            function getParents(child, graph) {
 
                 let results = [];
 
@@ -118,8 +170,9 @@ const graphModule = (function () {
                 }
 
                 return results;
-            },
-            linkToParents: function (child, parents) {
+            }
+            //linkToParents
+            function link(child, parents) {
 
                 let relations = [];
 
@@ -134,91 +187,54 @@ const graphModule = (function () {
 
                 return relations;
             }
-        },
-        parseInput: function (input, graph) {
+            //traverseParents
+            function traverseParents(children, graph, relations = []) {
 
-            let result = [];
-            let firstElement = this.helpers.findByName(input, graph);
-            result.push(firstElement);
+                if (children.length === 0) {
 
-            return result;
-        },
-        traverseChildren: function traverseChildren(parents, graph, relations = []) {
-
-            if (parents.length === 0) {
-
-                return relations;
-            }
-            else {
-
-                let element = parents[0];
-
-                if (element.hasChildren) {
-
-                    let newRelations = relations.slice();
-                    newRelations = newRelations.concat(this.traversal.linkToChildren(element));
-
-                    let children = this.traversal.getChildren(element);
-                    let newParents = [];
-
-                    newParents = parents.concat(children);
-                    newParents.splice(0, 1);
-
-                    return traverseChildren(newParents, graph, newRelations);
+                    return relations;
                 }
                 else {
-                    let newParents = parents.slice();
-                    newParents.splice(0, 1);
 
-                    return traverseChildren(newParents, graph, relations);
+                    let element = children[0];
+                    let parents = getParents(element, graph);
+
+                    if (parents.length !== 0) {
+
+                        let newRelations = relations.slice();
+                        newRelations = newRelations.concat(link(element, parents));
+
+                        let newChildren = [];
+
+                        newChildren = children.concat(parents);
+                        newChildren.splice(0, 1);
+
+                        return traverseParents(newChildren, graph, newRelations);
+                    }
+                    else {
+                        let newChildren = children.slice();
+                        newChildren.splice(0, 1);
+
+                        return traverseParents(newChildren, graph, relations);
+                    }
+
                 }
-
             }
 
-        },
-        traverseParents: function traverseParents(children, graph, relations = []) {
-
-            if (children.length === 0) {
-
-                return relations;
-            }
-            else {
-
-                let element = children[0];
-                let parents = this.traversal.getParents(element, graph);
-
-                if (parents.length !== 0) {
-
-                    let newRelations = relations.slice();
-                    newRelations = newRelations.concat(this.traversal.linkToParents(element, parents));
-
-                    let newChildren = [];
-
-                    newChildren = children.concat(parents);
-                    newChildren.splice(0, 1);
-
-                    return traverseParents(newChildren, graph, newRelations);
-                }
-                else {
-                    let newChildren = children.slice();
-                    newChildren.splice(0, 1);
-
-                    return traverseParents(newChildren, graph, relations);
-                }
-
-            }
+            return traverseParents(firstChild, graph);
         }
-    };
+    }
 
     //controller
     let controller = {
+
         getRelations: function (input, graph) {
 
             let relations = [];
             let parsed = methods.parseInput(input, graph);
 
-            relations = relations.concat(methods.traverseChildren(parsed, graph));
-            relations = relations.concat(methods.traverseParents(parsed, graph));
+            relations = relations.concat(methods.traverseToEnd(parsed, graph));
+            relations = relations.concat(methods.traverseToStart(parsed, graph));
 
             return relations;
         }
@@ -230,7 +246,9 @@ const graphModule = (function () {
 
             console.log(input);
             let relations = controller.getRelations(input, graph);
-            return methods.refresh(relations);
+            console.log(relations);
+
+            //return methods.refresh(relations);
         }
     }
 
