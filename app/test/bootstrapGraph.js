@@ -8,6 +8,38 @@ let graph = (function () {
         ["C1", "C2", "C3", "C4"]
     ];
 
+    function Element(name, col, row) {
+
+        //circel element
+        let el = paper.circle(col, row, 30);
+        el.node.id = name;
+        el.attr({
+            stroke: 'gray',
+            'stroke-width': 7,
+            'stroke-opacity': '0.5',
+            fill: '#61B329',
+            cursor: 'pointer',
+            class: 'graph-element'
+        });
+
+        //circle text
+        var text = paper.text(col, row, name);
+        text.node.id = name;
+        text.attr({ 
+            'font-size': 16,
+            'font-family': 'Arial, Helvetica, sans-serif',
+            cursor: 'pointer',
+            fill: 'white',
+            class: 'graph-element' 
+        })
+
+        return {
+            element : el,
+            text: text,
+        }
+
+    }
+
     function bootstrap(graphElements) {
 
         let graph = [];
@@ -21,16 +53,7 @@ let graph = (function () {
 
                 let col = ((j + 1) * 90);
 
-                let el = paper.circle((col), (row), 30);
-                el.node.id = graphElements[i][j];
-                el.attr({
-                    stroke: 'gray',
-                    'stroke-width': 7,
-                    'stroke-opacity': '0.5',
-                    fill: '#61B329',
-                    cursor: 'pointer',
-                    class: 'graph-element'
-                });
+                let el = new Element(graphElements[i][j], col, row);
 
                 graph.push(el);
             }
@@ -44,6 +67,5 @@ let graph = (function () {
     $('.graph-element').click(function () {
         alert(this.id);
     });
-
 
 })()

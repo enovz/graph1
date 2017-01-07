@@ -3,7 +3,7 @@
 
 const graphModule = (function () {
 
-    //graph bootstrap
+    //in memmory
     let graph = [
         [
             new Element("A1", ["B1", "B2"]),
@@ -33,18 +33,9 @@ const graphModule = (function () {
 
     //view
     let view = {
-        /**
-         * 1. init template:    1. get graph data
-         *                      2. draw graph
-         * 
-         * 2. drawRelation function :   1. get realtionData
-         *                              2. find realtionData positions
-         *                              3. return line connection 2 realtions in realtionData
-         * 
-         * jQuery get clicked graph element as input
-        */
+
         init: function(){
-            let ctx = document.getElementById("graph").msGetInputContext('2d');
+            
         }
     };
 
