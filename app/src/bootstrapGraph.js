@@ -64,8 +64,8 @@ let graph = (function () {
 
     let graph = bootstrap(graphElements);
 
-    $('.graph-element').click(function () {
+    /*$('.graph-element').click(function () {
         alert(this.id);
-    });
+    });*/
 
 })()

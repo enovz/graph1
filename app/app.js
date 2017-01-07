@@ -4,6 +4,15 @@
 const graphModule = (function () {
 
     //in memmory
+    function Element(name, children = []) {
+        this.name = name;
+        this.children = children.slice();
+        this.hasChildren = this.hasChildren();
+    }
+    Element.prototype.hasChildren = function () {
+
+        return this.children.length !== 0 ? true : false;
+    }
     let graph = [
         [
             new Element("A1", ["B1", "B2"]),
@@ -21,22 +30,15 @@ const graphModule = (function () {
             new Element("C4")
         ]
     ];
-    function Element(name, children = []) {
-        this.name = name;
-        this.children = children.slice();
-        this.hasChildren = this.hasChildren();
-    }
-    Element.prototype.hasChildren = function () {
 
-        return this.children.length !== 0 ? true : false;
-    }
 
     let $el = $('#graph');
 
     //view
     let view = {
-        
+
     };
+
 
     //methods
     let methods = {
@@ -45,14 +47,6 @@ const graphModule = (function () {
          *                 2. call drawRelation function for each relation
         */
         helpers: {
-            parseInput: function (input, graph) {
-
-                let result = [];
-                let firstElement = helpers.findByName(input, graph);
-                result.push(firstElement);
-
-                return result;
-            },
             findByName: function (input, graph) {
 
                 for (let i = 0; i < graph.length; i++) {
@@ -78,7 +72,7 @@ const graphModule = (function () {
                 if (parent.hasChildren) {
 
                     parent.children.forEach(child => {
-                        result.push(helpers.findByName(child, graph));
+                        result.push(this.helpers.findByName(child, graph));
                     });
 
                     return result;
@@ -141,6 +135,14 @@ const graphModule = (function () {
                 return relations;
             }
         },
+        parseInput: function (input, graph) {
+
+            let result = [];
+            let firstElement = this.helpers.findByName(input, graph);
+            result.push(firstElement);
+
+            return result;
+        },
         traverseChildren: function traverseChildren(parents, graph, relations = []) {
 
             if (parents.length === 0) {
@@ -154,9 +156,9 @@ const graphModule = (function () {
                 if (element.hasChildren) {
 
                     let newRelations = relations.slice();
-                    newRelations = newRelations.concat(traversal.linkToChildren(element));
+                    newRelations = newRelations.concat(this.traversal.linkToChildren(element));
 
-                    let children = traversal.getChildren(element);
+                    let children = this.traversal.getChildren(element);
                     let newParents = [];
 
                     newParents = parents.concat(children);
@@ -183,12 +185,12 @@ const graphModule = (function () {
             else {
 
                 let element = children[0];
-                let parents = traversal.getParents(element, graph);
+                let parents = this.traversal.getParents(element, graph);
 
                 if (parents.length !== 0) {
 
                     let newRelations = relations.slice();
-                    newRelations = newRelations.concat(traversal.linkToParents(element, parents));
+                    newRelations = newRelations.concat(this.traversal.linkToParents(element, parents));
 
                     let newChildren = [];
 
@@ -213,7 +215,7 @@ const graphModule = (function () {
         getRelations: function (input, graph) {
 
             let relations = [];
-            let parsed = helpers.parseInput(input, graph);
+            let parsed = methods.parseInput(input, graph);
 
             relations = relations.concat(methods.traverseChildren(parsed, graph));
             relations = relations.concat(methods.traverseParents(parsed, graph));
@@ -224,14 +226,18 @@ const graphModule = (function () {
 
     //eventHandlers
     let eventHandlers = {
-        clickOnElement: function () {
+        clickOnElement: function (input) {
 
-            /*input = jQerry get clikced element*/
+            console.log(input);
             let relations = controller.getRelations(input, graph);
-
             return methods.refresh(relations);
         }
     }
+
+    //bind events
+    $('.graph-element').click(function () {
+        eventHandlers.clickOnElement(this.id);
+    });
 
     //api
     let api = {
