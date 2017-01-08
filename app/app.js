@@ -3,7 +3,7 @@
 
 const graphModule = (function () {
 
-    //in memmory
+    //requested from service
     function Element(name, children = []) {
         this.name = name;
         this.children = children.slice();
@@ -30,23 +30,23 @@ const graphModule = (function () {
             new Element("C4")
         ]
     ];
+    //end requested
 
-    //Raphael paper
-    let $paper = $('#graph');
+    let $graph = $('#graph');
+    let paper = Raphael("graph");
+    let elements = [];
 
     //view
     let view = {
 
-        init: function bootrapGraph(graph) {
-
-            let paper = Raphael("graph");
+        init: function bootstrapGraph(graph) {
 
             function Element(name, col, row) {
 
-                //circel element
-                let el = paper.circle(col, row, 30);
-                el.node.id = name;
-                el.attr({
+                //element circle
+                let circle = paper.circle(col, row, 30);
+                circle.node.id = name;
+                circle.attr({
                     stroke: 'gray',
                     'stroke-width': 7,
                     'stroke-opacity': '0.5',
@@ -55,7 +55,7 @@ const graphModule = (function () {
                     class: 'graph-element'
                 });
 
-                //circle text
+                //element text
                 var text = paper.text(col, row, name);
                 text.node.id = name;
                 text.attr({
@@ -64,41 +64,44 @@ const graphModule = (function () {
                     cursor: 'pointer',
                     fill: 'white',
                     class: 'graph-element'
-                })
+                });
 
                 return {
-                    element: el,
-                    text: text,
+                    id: name,
+                    x: circle.attr('cx'),
+                    y: circle.attr('cy')
                 }
-
             }
 
-            let result = [];
+            for (let i = 0; i < graph.length; i++) {
 
-            for (let i = 0; i < graphElements.length; i++) {
-
-                let elementsGroup = graphElements[i];
+                let elementsGroup = graph[i];
                 let row = ((i + 1) * 100);
 
                 for (let j = 0; j < elementsGroup.length; j++) {
 
                     let col = ((j + 1) * 90);
 
-                    let el = new Element(graphElements[i][j], col, row);
-
-                    graph.push(el);
+                    let element = new Element(graph[i][j].name, col, row);
+                    elements.push(element);
                 }
             }
 
-            return result;
-
         },
         createLink: function connect(points) {
-            
-            let A = points.a;
-            let B = points.b;
 
-            //draw line between points on $paper
+            if($graph.find('#' + points.start) && $graph.find('#' + points.end)){
+                
+                let start = elements.filter(element => {
+                    return element.id === points.start
+                })[0];
+
+                let end  = elements.filter(element => {
+                    return element.id === points.end;
+                })[0];
+
+                let line = paper.path(["M", start.x, start.y, "L", end.x, end.y]);  
+            }
         }
 
     };
@@ -127,7 +130,7 @@ const graphModule = (function () {
     //methods
     let methods = {
 
-        refresh: function graphRelations(relatinos) {
+        refresh: function graphRelations(relations) {
 
             //first clear all;
 
@@ -312,21 +315,31 @@ const graphModule = (function () {
     let eventHandlers = {
         clickOnElement: function (input) {
 
-            console.log(input);
             let relations = controller.getRelations(input, graph);
-
             return methods.refresh(relations);
         }
     }
 
     //bind events
-    $('.graph-element').click(function () {
-        eventHandlers.clickOnElement(this.id);
-    });
+    let events = {
+        getInput: function () {
+            $graph.find('.graph-element').click(function () {
+                eventHandlers.clickOnElement(this.id);
+            })
+        }
+    }
+
+    //initalize app
+    function init() {
+
+        view.init(graph);
+        events.getInput();
+    }
 
     //api
     let api = {
 
+        start: init(),
         getRelations: controller.getRelations
     }
 

@@ -62,6 +62,6 @@ let graph = (function () {
         return graph;
     }
 
-    let graph = bootstrap(graphElements);
+    return bootstrap(graphElements);
 
 })()
