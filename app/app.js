@@ -30,8 +30,9 @@ const graphModule = (function () {
             new Element("C4")
         ]
     ];
-    //end requested
+    //end requested 
 
+    //common
     let $graph = $('#graph');
     let paper = Raphael("graph");
     let elements = [];
@@ -66,8 +67,6 @@ const graphModule = (function () {
                     class: 'graph-element'
                 });
 
-                console.log(circle.attr('r'));
-
                 return {
                     id: name,
                     x: circle.attr('cx'),
@@ -92,24 +91,39 @@ const graphModule = (function () {
         },
         createLink: function connect(points) {
 
-            if($graph.find('#' + points.start) && $graph.find('#' + points.end)){
-                
+            if ($graph.find('#' + points.start) && $graph.find('#' + points.end)) {
+
                 let start = elements.filter(element => {
                     return element.id === points.start
                 })[0];
 
-                let end  = elements.filter(element => {
+                let end = elements.filter(element => {
                     return element.id === points.end;
                 })[0];
 
-                let line = paper.path(["M", start.x, start.y, "L", end.x, end.y]);  
+                let line = paper.path(["M", start.x, start.y, "L", end.x, end.y]);
+                line.attr({
+                    stroke: 'gray',
+                    'stroke-width': 4,
+                    'stroke-opacity': '0.5'
+                });
             }
-        }
+        },
+        refresh: function graphRelations(relations) {
+
+            paper.clear();
+
+            relations.forEach(relation => {
+                view.createLink(relation);
+            });
+
+            init();
+        },
 
     };
 
-    //utils
-    let utils = {
+    //methods
+    let methods = {
 
         findByName: function findByName(input, graph) {
 
@@ -126,24 +140,11 @@ const graphModule = (function () {
                 }
             }
 
-        }
-    }
-
-    //methods
-    let methods = {
-
-        refresh: function graphRelations(relations) {
-
-            //first clear all;
-
-            relations.forEach(relation => {
-                view.createLink(relation);
-            });
         },
         parseInput: function parseInput(input, graph) {
 
             let result = [];
-            let firstElement = utils.findByName(input, graph);
+            let firstElement = methods.findByName(input, graph);
             result.push(firstElement);
 
             return result;
@@ -157,7 +158,7 @@ const graphModule = (function () {
                 if (parent.hasChildren) {
 
                     parent.children.forEach(child => {
-                        result.push(utils.findByName(child, graph));
+                        result.push(methods.findByName(child, graph));
                     });
 
                     return result;
@@ -318,7 +319,7 @@ const graphModule = (function () {
         clickOnElement: function (input) {
 
             let relations = controller.getRelations(input, graph);
-            return methods.refresh(relations);
+            return view.refresh(relations);
         }
     }
 
@@ -341,7 +342,8 @@ const graphModule = (function () {
     //api
     let api = {
 
-        start: init(),
+        init: init(),
+        start: init,
         getRelations: controller.getRelations
     }
 
