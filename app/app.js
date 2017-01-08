@@ -31,11 +31,75 @@ const graphModule = (function () {
         ]
     ];
 
-    //holds paper
-    let $el = $('#graph');
+    //Raphael paper
+    let $paper = $('#graph');
 
     //view
     let view = {
+
+        init: function bootrapGraph(graph) {
+
+            let paper = Raphael("graph");
+
+            function Element(name, col, row) {
+
+                //circel element
+                let el = paper.circle(col, row, 30);
+                el.node.id = name;
+                el.attr({
+                    stroke: 'gray',
+                    'stroke-width': 7,
+                    'stroke-opacity': '0.5',
+                    fill: '#61B329',
+                    cursor: 'pointer',
+                    class: 'graph-element'
+                });
+
+                //circle text
+                var text = paper.text(col, row, name);
+                text.node.id = name;
+                text.attr({
+                    'font-size': 16,
+                    'font-family': 'Arial, Helvetica, sans-serif',
+                    cursor: 'pointer',
+                    fill: 'white',
+                    class: 'graph-element'
+                })
+
+                return {
+                    element: el,
+                    text: text,
+                }
+
+            }
+
+            let result = [];
+
+            for (let i = 0; i < graphElements.length; i++) {
+
+                let elementsGroup = graphElements[i];
+                let row = ((i + 1) * 100);
+
+                for (let j = 0; j < elementsGroup.length; j++) {
+
+                    let col = ((j + 1) * 90);
+
+                    let el = new Element(graphElements[i][j], col, row);
+
+                    graph.push(el);
+                }
+            }
+
+            return result;
+
+        },
+        createLink: function connect(points) {
+            
+            let A = points.a;
+            let B = points.b;
+
+            //draw line between points on $paper
+        }
 
     };
 
@@ -62,11 +126,15 @@ const graphModule = (function () {
 
     //methods
     let methods = {
-        /**
-        * refresh method: 1. get graphRelations
-        *                 2. call drawRelation function for each relation
-        */
 
+        refresh: function graphRelations(relatinos) {
+
+            //first clear all;
+
+            relations.forEach(relation => {
+                view.createLink(relation);
+            });
+        },
         parseInput: function parseInput(input, graph) {
 
             let result = [];
@@ -246,9 +314,8 @@ const graphModule = (function () {
 
             console.log(input);
             let relations = controller.getRelations(input, graph);
-            console.log(relations);
 
-            //return methods.refresh(relations);
+            return methods.refresh(relations);
         }
     }
 
@@ -259,6 +326,7 @@ const graphModule = (function () {
 
     //api
     let api = {
+
         getRelations: controller.getRelations
     }
 
