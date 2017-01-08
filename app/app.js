@@ -66,11 +66,13 @@ const graphModule = (function () {
                     class: 'graph-element'
                 });
 
+                console.log(circle.attr('r'));
+
                 return {
                     id: name,
                     x: circle.attr('cx'),
                     y: circle.attr('cy')
-                }
+                };
             }
 
             for (let i = 0; i < graph.length; i++) {
@@ -80,7 +82,7 @@ const graphModule = (function () {
 
                 for (let j = 0; j < elementsGroup.length; j++) {
 
-                    let col = ((j + 1) * 90);
+                    let col = ((j + 1) * 100);
 
                     let element = new Element(graph[i][j].name, col, row);
                     elements.push(element);
