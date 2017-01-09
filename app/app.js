@@ -359,7 +359,8 @@ const graphModule = (function () {
         start: init,
         stop: close,
         findByName: methods.findByName,
-        getRelations: eventHandlers.clickOnElement
+        getRelations: getRelations,
+        clikcOnElement: eventHandlers.clickOnElement
     }
 
     return api;
