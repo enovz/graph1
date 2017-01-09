@@ -34,7 +34,7 @@ const graphModule = (function () {
 
     //common
     let $graph = $('#graph');
-    let paper = Raphael("graph");
+    let paper = Raphael('graph');
     let elements = [];
 
     //view
@@ -89,7 +89,7 @@ const graphModule = (function () {
             }
 
         },
-        createLink: function connect(points) {
+        drawLine: function connect(points) {
 
             if ($graph.find('#' + points.start) && $graph.find('#' + points.end)) {
 
@@ -114,7 +114,7 @@ const graphModule = (function () {
             paper.clear();
 
             relations.forEach(relation => {
-                view.createLink(relation);
+                view.drawLine(relation);
             });
 
             init();
@@ -338,13 +338,19 @@ const graphModule = (function () {
         view.init(graph);
         events.getInput();
     }
+    //close app
+    function close() {
+
+        $graph.off(events.getInput);
+        paper.clear();
+    }
 
     //api
     let api = {
 
-        init: init(),
         start: init,
-        getRelations: controller.getRelations
+        stop: close,
+        getRelations: eventHandlers.clickOnElement
     }
 
     return api;
