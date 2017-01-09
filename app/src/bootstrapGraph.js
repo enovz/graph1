@@ -1,67 +1,75 @@
 
-let graph = (function () {
+'use strict';
 
-    let paper = Raphael("graph");
+(function () {
+
     let graphElements = [
         ["A1", "A2", "A3"],
         ["B1", "B2"],
         ["C1", "C2", "C3", "C4"]
     ];
 
-    function Element(name, col, row) {
+    let graph = (function (graphElements) {
 
-        //circel element
-        let el = paper.circle(col, row, 30);
-        el.node.id = name;
-        el.attr({
-            stroke: 'gray',
-            'stroke-width': 7,
-            'stroke-opacity': '0.5',
-            fill: '#61B329',
-            cursor: 'pointer',
-            class: 'graph-element'
-        });
+        let paper = Raphael("graph");
 
-        //circle text
-        var text = paper.text(col, row, name);
-        text.node.id = name;
-        text.attr({ 
-            'font-size': 16,
-            'font-family': 'Arial, Helvetica, sans-serif',
-            cursor: 'pointer',
-            fill: 'white',
-            class: 'graph-element' 
-        })
+        function Element(name, col, row) {
 
-        return {
-            element : el,
-            text: text,
-        }
+            //circel element
+            let el = paper.circle(col, row, 30);
+            el.node.id = name;
+            el.attr({
+                stroke: 'gray',
+                'stroke-width': 7,
+                'stroke-opacity': '0.5',
+                fill: '#61B329',
+                cursor: 'pointer',
+                class: 'graph-element'
+            });
 
-    }
+            //circle text
+            var text = paper.text(col, row, name);
+            text.node.id = name;
+            text.attr({
+                'font-size': 16,
+                'font-family': 'Arial, Helvetica, sans-serif',
+                cursor: 'pointer',
+                fill: 'white',
+                class: 'graph-element'
+            })
 
-    function bootstrap(graphElements) {
-
-        let graph = [];
-
-        for (let i = 0; i < graphElements.length; i++) {
-
-            let elementsGroup = graphElements[i];
-            let row = ((i + 1) * 100);
-
-            for (let j = 0; j < elementsGroup.length; j++) {
-
-                let col = ((j + 1) * 90);
-
-                let el = new Element(graphElements[i][j], col, row);
-
-                graph.push(el);
+            return {
+                element: el,
+                text: text,
             }
+
         }
 
-        return graph;
-    }
+        function bootstrap(graphElements) {
 
-    return bootstrap(graphElements);
+            let graph = [];
 
+            for (let i = 0; i < graphElements.length; i++) {
+
+                let elementsGroup = graphElements[i];
+                let row = ((i + 1) * 100);
+
+                for (let j = 0; j < elementsGroup.length; j++) {
+
+                    let col = ((j + 1) * 90);
+
+                    let el = new Element(graphElements[i][j], col, row);
+
+                    graph.push(el);
+                }
+            }
+
+            return graph;
+        }
+
+        return bootstrap(graphElements);
+
+    })(graphElements)
+    
 })()
+
