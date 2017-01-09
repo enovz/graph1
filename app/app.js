@@ -48,10 +48,10 @@ const graphModule = (function () {
 
         init: function bootstrapGraph() {
 
-            function Element(name, col, row) {
+            function Element(name, col, row, radius = 30) {
 
                 //element circle
-                let circle = paper.circle(col, row, 30);
+                let circle = paper.circle(col, row, radius);
                 circle.node.id = name;
                 circle.attr({
                     stroke: 'gray',
