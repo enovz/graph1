@@ -71,5 +71,7 @@
 
     })(graphElements)
     
+    return graph;
+    
 })()
 

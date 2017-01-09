@@ -4,34 +4,38 @@
 const graphModule = (function () {
 
     //requested from service
-    function Element(name, children = []) {
-        this.name = name;
-        this.children = children.slice();
-        this.hasChildren = this.hasChildren();
-    }
-    Element.prototype.hasChildren = function () {
+    let graph = (function () {
 
-        return this.children.length !== 0 ? true : false;
-    }
-    let graph = [
-        [
-            new Element("A1", ["B1", "B2"]),
-            new Element("A2", ["B1"]),
-            new Element("A3", ["B2"])
-        ],
-        [
-            new Element("B1", ["C1", "C2", "C3", "C4"]),
-            new Element("B2", ["C1", "C3"])
-        ],
-        [
-            new Element("C1"),
-            new Element("C2"),
-            new Element("C3"),
-            new Element("C4")
-        ]
-    ];
+        function Element(name, children = []) {
+            this.name = name;
+            this.children = children.slice();
+            this.hasChildren = this.hasChildren();
+        }
+        Element.prototype.hasChildren = function () {
 
-    //end requested 
+            return this.children.length !== 0 ? true : false;
+        }
+        let graph = [
+            [
+                new Element("A1", ["B1", "B2"]),
+                new Element("A2", ["B1"]),
+                new Element("A3", ["B2"])
+            ],
+            [
+                new Element("B1", ["C1", "C2", "C3", "C4"]),
+                new Element("B2", ["C1", "C3"])
+            ],
+            [
+                new Element("C1"),
+                new Element("C2"),
+                new Element("C3"),
+                new Element("C4")
+            ]
+        ];
+
+        return graph.slice();
+    })()
+    //end request
 
     //common
     let $graph = $('#graph');
@@ -351,6 +355,7 @@ const graphModule = (function () {
 
         start: init,
         stop: close,
+        findByName: methods.findByName,
         getRelations: eventHandlers.clickOnElement
     }
 
