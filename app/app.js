@@ -37,15 +37,16 @@ const graphModule = (function () {
     })()
     //end request
 
-    //common
+
+    //global to Module
     let $graph = $('#graph');
     let paper = Raphael('graph', '100%', '100%');
-    let elements = [];
+    let graphElements = [];
 
     //view
     let view = {
 
-        init: function bootstrapGraph(graph) {
+        init: function bootstrapGraph() {
 
             function Element(name, col, row) {
 
@@ -89,7 +90,7 @@ const graphModule = (function () {
                     let col = ((j + 1) * 100);
 
                     let element = new Element(graph[i][j].name, col, row);
-                    elements.push(element);
+                    graphElements.push(element);
                 }
             }
 
@@ -98,13 +99,14 @@ const graphModule = (function () {
 
             if ($graph.find('#' + points.start) && $graph.find('#' + points.end)) {
 
-                let start = elements.filter(element => {
+                let start = graphElements.filter(element => {
                     return element.id === points.start
                 })[0];
 
-                let end = elements.filter(element => {
+                let end = graphElements.filter(element => {
                     return element.id === points.end;
                 })[0];
+
 
                 let line = paper.path(["M", start.x, start.y, "L", end.x, end.y]);
                 line.attr({
@@ -130,7 +132,7 @@ const graphModule = (function () {
     //methods
     let methods = {
 
-        findByName: function findByName(input, graph) {
+        findByName: function findByName(input) {
 
             for (let i = 0; i < graph.length; i++) {
 
@@ -146,15 +148,15 @@ const graphModule = (function () {
             }
 
         },
-        parseInput: function parseInput(input, graph) {
+        parseInput: function parseInput(input) {
 
             let result = [];
-            let firstElement = methods.findByName(input, graph);
+            let firstElement = methods.findByName(input);
             result.push(firstElement);
 
             return result;
         },
-        traverseToEnd: function traverseToEnd(firstParent, graph) {
+        traverseToEnd: function traverseToEnd(firstParent) {
             //getChildren
             function getChildren(parent) {
 
@@ -163,7 +165,7 @@ const graphModule = (function () {
                 if (parent.hasChildren) {
 
                     parent.children.forEach(child => {
-                        result.push(methods.findByName(child, graph));
+                        result.push(methods.findByName(child));
                     });
 
                     return result;
@@ -195,7 +197,7 @@ const graphModule = (function () {
                 }
             }
             //traverse children
-            function traverseChildren(parents, graph, relations = []) {
+            function traverseChildren(parents, relations = []) {
 
                 if (parents.length === 0) {
 
@@ -216,24 +218,24 @@ const graphModule = (function () {
                         newParents = parents.concat(children);
                         newParents.splice(0, 1);
 
-                        return traverseChildren(newParents, graph, newRelations);
+                        return traverseChildren(newParents, newRelations);
                     }
                     else {
                         let newParents = parents.slice();
                         newParents.splice(0, 1);
 
-                        return traverseChildren(newParents, graph, relations);
+                        return traverseChildren(newParents, relations);
                     }
 
                 }
 
             }
 
-            return traverseChildren(firstParent, graph);
+            return traverseChildren(firstParent);
         },
-        traverseToStart: function traverseToStart(firstChild, graph) {
+        traverseToStart: function traverseToStart(firstChild) {
             //getParents
-            function getParents(child, graph) {
+            function getParents(child) {
 
                 let results = [];
 
@@ -267,7 +269,7 @@ const graphModule = (function () {
                 return relations;
             }
             //traverseParents
-            function traverseParents(children, graph, relations = []) {
+            function traverseParents(children, relations = []) {
 
                 if (children.length === 0) {
 
@@ -276,7 +278,7 @@ const graphModule = (function () {
                 else {
 
                     let element = children[0];
-                    let parents = getParents(element, graph);
+                    let parents = getParents(element);
 
                     if (parents.length !== 0) {
 
@@ -288,32 +290,32 @@ const graphModule = (function () {
                         newChildren = children.concat(parents);
                         newChildren.splice(0, 1);
 
-                        return traverseParents(newChildren, graph, newRelations);
+                        return traverseParents(newChildren, newRelations);
                     }
                     else {
                         let newChildren = children.slice();
                         newChildren.splice(0, 1);
 
-                        return traverseParents(newChildren, graph, relations);
+                        return traverseParents(newChildren, relations);
                     }
 
                 }
             }
 
-            return traverseParents(firstChild, graph);
+            return traverseParents(firstChild);
         }
     }
 
     //controller
     let controller = {
 
-        getRelations: function (input, graph) {
+        getRelations: function (input) {
 
             let relations = [];
-            let parsed = methods.parseInput(input, graph);
+            let parsed = methods.parseInput(input);
 
-            relations = relations.concat(methods.traverseToEnd(parsed, graph));
-            relations = relations.concat(methods.traverseToStart(parsed, graph));
+            relations = relations.concat(methods.traverseToEnd(parsed));
+            relations = relations.concat(methods.traverseToStart(parsed));
 
             return relations;
         }
@@ -323,7 +325,8 @@ const graphModule = (function () {
     let eventHandlers = {
         clickOnElement: function (input) {
 
-            let relations = controller.getRelations(input, graph);
+            let relations = controller.getRelations(input);
+
             return view.refresh(relations);
         }
     }
@@ -340,7 +343,7 @@ const graphModule = (function () {
     //initalize app
     function init() {
 
-        view.init(graph);
+        view.init();
         events.getInput();
     }
     //close app
