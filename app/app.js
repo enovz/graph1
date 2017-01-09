@@ -30,11 +30,12 @@ const graphModule = (function () {
             new Element("C4")
         ]
     ];
+
     //end requested 
 
     //common
     let $graph = $('#graph');
-    let paper = Raphael('graph');
+    let paper = Raphael('graph', '100%', '100%');
     let elements = [];
 
     //view

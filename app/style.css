@@ -1,13 +1,28 @@
 /*graph style*/
 
-body{
+html,body{
   width: 100%;
   height: 100%;
+  display: table;
+}
+    .fill { 
+        min-height: 100%;
+        height: 100%;
+    }
+
+#graph-container{
+  min-width: 100%;
+  min-height: 100%;
+  width:100%;
+  height: 100%;
+  display: table-cell;
 }
 
 #graph{
-  display: inline-block;
-  min-width: 100%;
+  min-width: 50%;
   min-height: 100%;
+  width:50%;
+  height: 100%;
+  margin-left: 25%;
 }
 
